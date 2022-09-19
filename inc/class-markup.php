@@ -24,8 +24,25 @@ class Markup {
             $text = $value->text;
 
             $html .= "<li class='es-task-item' id='line-item-{$id}'>";
-            $html .= "<input type='checkbox' onchange='todo.updateItem( this )' data-id='{$id}' id='checkbox-{$id}' $checked  />";
-            $html .= "<label contenteditable='true' data-checked='{$checked}' data-id='{$id}' id='todo-text-{$id}' onkeyup='todo.updateItem( this )'>{$text}</label>";
+            $html .= "<input type='checkbox' onchange='todo.updateItem( event, this )' data-id='{$id}' id='checkbox-{$id}' $checked  />";
+            $html .= "<label contenteditable='true' data-checked='{$checked}' data-id='{$id}' id='todo-text-{$id}' onkeydown='todo.preventDefault(event)' onkeyup='todo.updateItem( event, this ), todo.createSubTask(event, this)'>{$text}</label>";
+
+            foreach( $value as $item ) {
+                if( is_object($item) ) {
+
+                    $checked =  $item->complete ? 'checked' : '';
+                    $id = $item->id;
+                    $text = $item->text;
+
+                    $html .= '<ul>';
+                    $html .= "<li class='es-task-item' id='line-item-{$id}'>";
+                    $html .= "<input type='checkbox' onchange='todo.updateItem( event, this )' data-id='{$id}' id='checkbox-{$id}' $checked  />";
+                    $html .= "<label contenteditable='true' data-checked='{$checked}' data-id='{$id}' id='todo-text-{$id}' onkeydown='todo.preventDefault(event)' onkeyup='todo.updateItem( event, this ), todo.createSubTask(event, this)'>{$text}</label>";
+                    $html .= "</li>";
+                    $html .= '</ul>';
+                }
+            }
+
             $html .= "</li>";
         }
         $html .= '</ul>';

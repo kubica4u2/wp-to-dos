@@ -3,6 +3,7 @@ class Todo {
     apiUrl = '/wp-json/todos/v2/update_todos';
     apiCreateUrl = '/wp-json/todos/v2/create_todos';
     apiDeleteUrl = '/wp-json/todos/v2/delete_todos';
+    apiCreateSubTaskUrl =  '/wp-json/todos/v2/subtask_todos';
 
     addPost(e) {
         if(e.keyCode === 13 || e.key === 'Enter') {
@@ -10,24 +11,31 @@ class Todo {
         }
     }
 
-    updateItem( element ) {
-
-        let id = element.dataset.id;
-        let checked = document.getElementById(`checkbox-${id}`).checked;
-        let text = document.getElementById(`todo-text-${id}`).innerHTML;
-
-        let data = {
-            id,
-            checked,
-            text
+    preventDefault(e) {
+        if(e.keyCode === 13 || e.key === 'Enter') {
+            e.preventDefault();
         }
+    }
 
-        if( text === '' ) {
-            this.sendData(data, 'delete').then(() => this.deleteItem( data ));
-        } else {
-            this.sendData(data, 'update').then();
+    updateItem( e,  element ) {
+
+        if(element !== undefined) {
+            let id = element.dataset.id;
+            let checked = document.getElementById(`checkbox-${id}`).checked;
+            let text = document.getElementById(`todo-text-${id}`).innerHTML;
+
+            let data = {
+                id,
+                checked,
+                text
+            }
+
+            if( text === '' ) {
+                this.sendData(data, 'delete').then(() => this.deleteItem( data ));
+            } else {
+                this.sendData(data, 'update').then();
+            }
         }
-
     }
 
     deleteItem( data ) {
@@ -52,23 +60,20 @@ class Todo {
                     let newItem = `
                         <li class="es-task-item" id="line-item-${data.id}">
                             <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
-                            <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeyup="new Todo().updateItem( this )">
+                            <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
                                 ${text}
                             </label>
                         </li>
                     `;
                     esTodos.innerHTML += newItem;
                 }
-            });
+            }).then(() => location.reload());
 
         }
 
     }
 
     createSubTask( e, element ) {
-
-        console.log(e);
-
         if(e.keyCode === 13 || e.key === 'Enter') {
             e.preventDefault();
             let id = element.dataset.id;
@@ -76,26 +81,23 @@ class Todo {
 
             let data = {
                 id: new Date().valueOf(),
+                parentId: id,
                 checked: false,
                 text: 'New Item'
             }
-
-            let newItem = `
+            this.sendData(data, 'createsubtask').then(r => {
+                let newItem = `
                 <ul>
                     <li class="es-task-item" id="line-item-${data.id}">
                         <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
-                        <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeyup="new Todo().updateItem( this )">
+                        <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
                             ${data.text}
                         </label>
                     </li>
                 </ul>
-            `;
-
-
-            console.log(newItem);
-
-            lineItem.innerHTMl += newItem;
-
+                `;
+                lineItem.innerHTML += newItem;
+            }).then(() => location.reload());
         }
     }
 
@@ -110,6 +112,9 @@ class Todo {
             case 'delete' :
                 url = this.apiDeleteUrl;
                 break;
+            case 'createsubtask' :
+                url = this.apiCreateSubTaskUrl;
+                break;
             default:
                 url = this.apiUrl
         }
@@ -121,7 +126,6 @@ class Todo {
             console.log(err);
         }
     }
-
 
     useDebounce() {
         let timeout = null;
@@ -135,8 +139,6 @@ class Todo {
             }, delay || 500);
         };
     }
-
-
 
 }
 

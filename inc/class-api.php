@@ -48,6 +48,13 @@ class Api extends \WP_REST_Controller {
             ),
         ) );
 
+        register_rest_route( $this->root . "/" . $this->version, '/subtask_todos', array(
+            array(
+                'methods'  => 'POST',
+                'callback' => array( $this, 'subtask_todos' ),
+            ),
+        ) );
+
     }
 
 
@@ -57,16 +64,18 @@ class Api extends \WP_REST_Controller {
     public function update_todos( $request ) : void
     {
         if(  ! empty( $request->get_body() ) ) {
-            $todos =  json_decode( get_option( 'es_todos' ) );
+            $todos =  json_decode( get_option( 'es_todos' ), true );
             $request_data = json_decode( $request->get_body() );
 
+            foreach ($todos as &$value) {
 
-            foreach ($todos as $key => $value) {
-
-                 if( $value->id == $request_data->id ) {
-                     $value->text = $request_data->text;
-                     $value->complete = $request_data->checked;
-                 }
+                if ( $value['id'] == $request_data->id ) {
+                    $value['text'] = $request_data->text;
+                    $value['complete'] = $request_data->checked;
+                } else if ( $value[$request_data->id] ) {
+                    $value[$request_data->id]['text'] = $request_data->text;
+                    $value[$request_data->id]['complete'] = $request_data->checked;
+                }
             }
 
             update_option('es_todos', json_encode($todos) );
@@ -80,26 +89,16 @@ class Api extends \WP_REST_Controller {
             $todos =  json_decode( get_option( 'es_todos' ), true );
             $request_data = json_decode( $request->get_body() );
 
-            $create_record = true;
+            $new_item = [
+                'id' => $request_data->id,
+                'complete' => $request_data->checked,
+                'text' => $request_data->text
+            ];
 
-            foreach ($todos as $key => $value) {
-                if( $value->id == $request_data->id ) {
-                    $create_record = false;
-                }
-            }
+            $todos[] = $new_item;
 
-            if( $create_record ) {
-                $new_item = [
-                    'id' => $request_data->id,
-                    'complete' => $request_data->checked,
-                    'text' => $request_data->text
-                ];
+            update_option('es_todos', json_encode($todos) );
 
-                $todos[] = $new_item;
-
-                update_option('es_todos', json_encode($todos) );
-
-            }
         }
     }
 
@@ -112,11 +111,36 @@ class Api extends \WP_REST_Controller {
             foreach ($todos as $key => $value) {
                 if( $value['id'] == $request_data->id ) {
                     unset( $todos[$key] );
+                } else if( array_key_exists( $request_data->id, $value ) ) {
+                    unset( $todos[$key][$request_data->id] );
                 }
             }
 
             update_option('es_todos', json_encode($todos) );
 
+        }
+    }
+
+    public function subtask_todos( $request ) : void
+    {
+        if(  ! empty( $request->get_body() ) ) {
+            $todos = json_decode(get_option('es_todos'), true);
+            $request_data = json_decode($request->get_body());
+
+            foreach ($todos as $key => $value) {
+                if( $value['id'] == $request_data->parentId ) {
+
+                    $new_item = [
+                        'id' => $request_data->id,
+                        'complete' => $request_data->checked,
+                        'text' => $request_data->text
+                    ];
+
+                    $todos[$key][$request_data->id] = $new_item;
+
+                }
+            }
+            update_option('es_todos', json_encode($todos) );
         }
     }
 
