@@ -4,6 +4,7 @@ class Todo {
     apiCreateUrl = '/wp-json/todos/v2/create_todos';
     apiDeleteUrl = '/wp-json/todos/v2/delete_todos';
     apiCreateSubTaskUrl =  '/wp-json/todos/v2/subtask_todos';
+    clickCount = 0;
 
     addPost(e) {
         if(e.keyCode === 13 || e.key === 'Enter') {
@@ -18,8 +19,7 @@ class Todo {
     }
 
     updateItem( e,  element ) {
-
-        if(element !== undefined) {
+        if( element !== undefined ) {
             let id = element.dataset.id;
             let checked = document.getElementById(`checkbox-${id}`).checked;
             let text = document.getElementById(`todo-text-${id}`).innerHTML;
@@ -31,7 +31,16 @@ class Todo {
             }
 
             if( text === '' ) {
-                this.sendData(data, 'delete').then(() => this.deleteItem( data ));
+
+                if(data.id === id) {
+                    this.clickCount++;
+                }
+
+                if(this.clickCount === 2) {
+                    this.sendData(data, 'delete').then(() => this.deleteItem( data ));
+                    this.clickCount = 0;
+                }
+
             } else {
                 this.sendData(data, 'update').then();
             }
@@ -59,10 +68,12 @@ class Todo {
                 if( r === 200 ) {
                     let newItem = `
                         <li class="es-task-item" id="line-item-${data.id}">
-                            <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
-                            <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
-                                ${text}
-                            </label>
+                            <div class="flex flex-center py-20">
+                                <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
+                                <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
+                                    ${text}
+                                </label>
+                            </div>
                         </li>
                     `;
                     esTodos.innerHTML += newItem;
@@ -89,10 +100,12 @@ class Todo {
                 let newItem = `
                 <ul>
                     <li class="es-task-item" id="line-item-${data.id}">
-                        <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
-                        <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
-                            ${data.text}
-                        </label>
+                        <div class="flex flex-center py-20">
+                            <input type="checkbox" onchange="new Todo().updateItem( this )" data-id="${data.id}" id="checkbox-${data.id}">
+                            <label contenteditable="true" data-checked="checked" data-id="${data.id}" id="todo-text-${data.id}" onkeydown='todo.preventDefault(event)' onkeyup="todo.updateItem( this ), todo.createSubTask(event, this)">
+                                ${data.text}
+                            </label>
+                        </div>
                     </li>
                 </ul>
                 `;

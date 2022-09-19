@@ -30,7 +30,7 @@ class Init {
 
     public function createOptionsData() : string
     {
-        return '[{"id":1,"text":"to-do item","complete":true},{"id":2,"text":"to-do item","complete":true},{"id":3,"text":"to-do item","complete":false},{"id":4,"text":"to-do item","complete":true}]';
+        return '[{"id":1,"text":"to-do item","complete":true},{"id":2,"text":"to-do item","complete":false},{"id":3,"text":"to-do item","complete":false}]';
     }
 
 

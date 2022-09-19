@@ -7,8 +7,8 @@
     border-radius: 16px;
     order: 0;
     flex-grow: 0;
-    width: 90%;
     list-style: none;
+    filter: drop-shadow(0px 12px 44px rgba(0, 0, 0, 0.1));
 }
 .es-todos.dark {
     background-color: #333333;
@@ -17,24 +17,24 @@
 .es-todos.dark h2 {
     color: #fff;
 }
-.es-todos li {
+.es-todos li label {
     font-family: 'Rubik';
-    font-style: normal;
     font-weight: 400;
-    font-size: 16px;
-    line-height: 19px;
+    font-size: 26px;
+    line-height: 32px;
+    padding-left: 10px;
 }
 .es-heading {
     font-family: 'Rubik';
     font-style: normal;
     font-weight: 500;
-    font-size: 18px;
-    line-height: 24px;
-    margin-top: 20px;
+    font-size: 36px;
+    line-height: 48px;
+    margin: 20px 0 10px 0;
 }
 .es-new-task-wrapper {
     position: relative;
-    width: 100%;
+    width: 98%;
 }
 .es-new-task-button {
     position: absolute;
@@ -42,21 +42,89 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
+    background-image: url('../images/new-task-image.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
 }
 .es-new-task {
     width: 100%;
     border: 3px solid #BDBDBD;
     border-radius: 12px;
     border-color: #BDBDBD;
-    height: 40px;
-
+    height: 51px;
+    font-size: 32px;
 }
-.checkbox:checked + label {
+.es-new-task::placeholder {
+    font-family: 'Rubik';
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21.33px;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+}
+
+.es-task-item input[type = 'checkbox'] {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 48px;
+    height: 48px;
+    border: 3px solid #B4B4B4;
+    transform: translateY(-0.075em);
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.es-task-item input[type = 'checkbox']:checked {
+    background: #29ABE2;
+    background-image: url('../images/checkbox.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 3px solid #29ABE2;
+    background-size: 27.43px 23.13px;
+}
+.es-task-item input[type = 'checkbox']:checked + label {
     text-decoration: line-through;
+}
+.es-task-item ul {
+    list-style: none;
+    padding-left: 40px;
 }
 .form-table {
     display: inline;
 }
 .button.button-primary {
     margin-top: 14px;
+}
+
+.flex {
+    display: flex;
+}
+.flex-center {
+    align-items: center;
+}
+.py-20 {
+   padding: 20px 0;
+}
+@media(min-width: 767px) {
+    .es-todos li label {
+        font-weight: 400;
+        font-size: 32px;
+    }
+}
+
+/*** Admin Task Styles ***/
+.es-admin #es-todos li ul {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+.es-admin #es-todos {
+    width: 90%;
 }

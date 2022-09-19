@@ -42,7 +42,7 @@ class Settings {
     {
         register_setting( 'todos_display_mode', 'todos_display_mode' );
         add_settings_section( 'display_mode', 'To Dos Settings', [$this,'todos_section_text'], 'todos' );
-        add_settings_field( 'todos_display_mode', 'Development Mode', [$this,'todos_display_mode'], 'todos', 'display_mode' );
+        add_settings_field( 'todos_display_mode', 'Display Mode', [$this,'todos_display_mode'], 'todos', 'display_mode' );
     }
 
     public function todos_section_text() : void
