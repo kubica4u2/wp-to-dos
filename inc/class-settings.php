@@ -47,7 +47,7 @@ class Settings {
 
     public function todos_section_text() : void
     {
-        echo '<p>Change the color of your todo list</p>';
+        echo '<h4><strong>Shortcode</strong></h4><p>[todos]</p>';
     }
 
     public function todos_display_mode() : void
